@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Feria Vocacional — Ingeniería en Computación TEC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Fredoka:wght@500;600;700&family=Press+Start+2P&family=IBM+Plex+Mono:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{
+    margin:0; min-height:100vh; min-height:-webkit-fill-available;
+    font-family:'IBM Plex Sans', Arial, sans-serif;
+    display:flex; flex-direction:column; align-items:center;
+    overflow-x:hidden; transition:background .2s ease;
+  }
+  button{font-family:inherit; cursor:pointer;}
+  input{font-family:inherit;}
+  h1,h2,h3{margin:0;}
+
+  /* ============ shared app chrome ============ */
+  .appbar{
+    width:100%; max-width:640px; display:flex; align-items:center; justify-content:space-between;
+    padding:14px 16px; gap:10px;
+  }
+  .btn-nav{
+    border-radius:6px; padding:9px 14px; font-size:12.5px; font-weight:600;
+    font-family:'IBM Plex Mono',monospace; letter-spacing:.03em; white-space:nowrap;
+  }
+  .btn-nav.invisible{visibility:hidden;}
+  .appbar-spacer{flex:1;}
+
+  .view{width:100%; display:none; flex-direction:column; align-items:center; flex:1; padding-bottom:24px;}
+  .view.active{display:flex;}
+  .view-body{width:100%; max-width:560px; display:flex; flex-direction:column; align-items:center; padding:0 16px;}
+
+  .hidden{display:none !important;}
+
+  /* ============ THEME: HUB ============ */
+  body.theme-hub, body.theme-leaderboard{ background:#0B0B10; color:#EDEDF2; }
+  .marquee{
+    width:100%; max-width:560px; margin:6px 16px 22px; padding:4px;
+    background:repeating-linear-gradient(90deg, #C9A227 0 16px, #0B0B10 16px 32px);
+    border-radius:8px;
+  }
+  .marquee-inner{
+    background:#111118; border-radius:5px; padding:26px 20px; text-align:center;
+    border:2px solid #2A2A35;
+  }
+  .marquee-eyebrow{font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.22em; color:#C9A227; text-transform:uppercase; margin-bottom:10px;}
+  .marquee-title{font-family:'Anton', Impact, sans-serif; font-size:34px; line-height:1.05; letter-spacing:.01em; color:#F4F4F8; text-shadow:2px 2px 0 #C9A227;}
+  .marquee-sub{font-family:'IBM Plex Mono',monospace; font-size:12.5px; color:#9A9AAE; margin-top:10px; letter-spacing:.05em;}
+
+  .game-picks{width:100%; max-width:560px; padding:0 16px; display:flex; flex-direction:column; gap:16px; margin-bottom:18px;}
+  .pick-card{
+    display:flex; align-items:center; gap:16px; padding:18px; border-radius:8px;
+    border:3px solid #26262F; background:#15151C; text-align:left;
+  }
+  .pick-card:active{transform:translateY(1px);}
+  .pick-swatch{flex:0 0 auto; width:64px; height:64px; border-radius:6px; position:relative; overflow:hidden; border:2px solid #000;}
+  .pick-swatch.simon-swatch{display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr;}
+  .pick-swatch.simon-swatch div:nth-child(1){background:#2E9E46;}
+  .pick-swatch.simon-swatch div:nth-child(2){background:#D9392B;}
+  .pick-swatch.simon-swatch div:nth-child(3){background:#E0B02A;}
+  .pick-swatch.simon-swatch div:nth-child(4){background:#2F6FD1;}
+  .pick-swatch.pipes-swatch{background:#3E3226; display:flex; align-items:center; justify-content:center;}
+  .pick-swatch.pipes-swatch .pipe-demo{width:70%; height:26%; background:#8A8A8A; border:2px solid #000; position:relative;}
+  .pick-swatch.pipes-swatch .pipe-demo::after{content:""; position:absolute; top:-100%; left:38%; width:24%; height:100%; background:#8A8A8A; border:2px solid #000; border-bottom:none;}
+  .pick-text{flex:1;}
+  .pick-title{font-family:'Anton', Impact, sans-serif; font-size:20px; letter-spacing:.02em; color:#F4F4F8;}
+  .pick-desc{font-family:'IBM Plex Sans',sans-serif; font-size:12.5px; color:#9A9AAE; margin-top:4px; line-height:1.4;}
+  .pick-arrow{font-family:'IBM Plex Mono',monospace; font-size:20px; color:#C9A227;}
+
+  .hub-secondary{width:100%; max-width:560px; padding:0 16px; display:flex; gap:10px; margin-bottom:10px;}
+  .btn-outline-hub{
+    flex:1; background:transparent; border:2px solid #2A2A35; color:#CFCFDA;
+    border-radius:6px; padding:13px; font-size:13px; font-weight:600; font-family:'IBM Plex Mono',monospace;
+  }
+
+  .admin-link{
+    margin-top:16px; font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:#3A3A46;
+    text-decoration:none; padding:8px;
+  }
+
+  /* ============ THEME: SIMON ============ */
+  body.theme-simon{ background:#F3EFE6; color:#2A2620; }
+  .simon-card{width:100%; max-width:480px; padding:0 16px;}
+  .simon-panel{background:#FFFDF7; border:3px solid #2A2620; border-radius:4px; padding:22px 20px; margin-bottom:16px;}
+  .simon-wordmark{font-family:'Fredoka',sans-serif; font-weight:700; font-size:30px; color:#2A2620; text-align:center;}
+  .simon-wordmark .accent{color:#D9392B;}
+  .simon-lede{font-family:'IBM Plex Sans',sans-serif; font-size:14px; color:#5A5348; line-height:1.55; margin:12px 0 16px; text-align:center;}
+  .simon-rules{list-style:none; padding:0; margin:0 0 18px; font-family:'IBM Plex Mono',monospace; font-size:12px; color:#5A5348;}
+  .simon-rules li{padding:5px 0; border-bottom:1px dashed #D8D0BE;}
+  .simon-rules li:last-child{border-bottom:none;}
+  .simon-field-label{display:block; font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:#8A8272; margin-bottom:6px; font-family:'IBM Plex Mono',monospace;}
+  .simon-input{
+    width:100%; padding:13px 14px; font-size:16px; border-radius:3px;
+    border:2px solid #2A2620; background:#FFFDF7; color:#2A2620; outline:none; margin-bottom:14px;
+  }
+  .simon-input:focus{border-color:#D9392B;}
+  .btn-simon-primary{
+    width:100%; border:3px solid #2A2620; border-radius:3px; padding:14px; font-weight:700; font-size:15px;
+    background:#E0B02A; color:#2A2620; font-family:'Fredoka',sans-serif;
+    box-shadow:3px 3px 0 #2A2620;
+  }
+  .btn-simon-primary:active{box-shadow:1px 1px 0 #2A2620; transform:translate(2px,2px);}
+  .btn-simon-primary:disabled{opacity:.4; box-shadow:none;}
+  .btn-simon-ghost{
+    width:100%; border:2px solid #2A2620; border-radius:3px; padding:12px; font-weight:600; font-size:13px;
+    background:transparent; color:#2A2620; font-family:'IBM Plex Mono',monospace; margin-top:8px;
+  }
+
+  .simon-status{width:100%; text-align:center; font-family:'IBM Plex Mono',monospace; font-size:13px; color:#8A8272; margin-bottom:14px; min-height:18px; font-weight:600;}
+  .simon-status.your-turn{color:#D9392B;}
+
+  .saucer-wrap{width:100%; max-width:380px; aspect-ratio:1/1; margin:0 auto 16px; position:relative;}
+  .saucer-housing{position:absolute; inset:0; border-radius:50%; background:#26241F; padding:18px; box-shadow:0 8px 0 #17160F;}
+  .saucer-ring{position:absolute; inset:18px; border-radius:50%; background:#F3EFE6; padding:8px;}
+  .pad-grid{position:absolute; inset:0; display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; gap:6px;}
+  .pad{border:none; position:relative;}
+  .pad-green{background:#1E5C2E; border-radius:100% 0 0 0;}
+  .pad-red{background:#7A2018; border-radius:0 100% 0 0;}
+  .pad-yellow{background:#7A5E12; border-radius:0 0 0 100%;}
+  .pad-blue{background:#123A63; border-radius:0 0 100% 0;}
+  .pad.active.pad-green{background:#33B24A;}
+  .pad.active.pad-red{background:#E0473A;}
+  .pad.active.pad-yellow{background:#E8B923;}
+  .pad.active.pad-blue{background:#2F6FD1;}
+  .pad:active{filter:brightness(1.1);}
+  .saucer-center{
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    width:26%; height:26%; border-radius:50%; background:#17160F;
+    display:flex; align-items:center; justify-content:center; z-index:5;
+    border:3px solid #0B0A07;
+  }
+  .led-display{background:#2B0B0B; border-radius:2px; padding:5px 8px; text-align:center; border:1px solid #000;}
+  .led-display b{display:block; font-family:'IBM Plex Mono',monospace; font-weight:700; color:#FF3B30; font-size:15px; letter-spacing:.05em;}
+  .led-display span{display:block; font-family:'IBM Plex Mono',monospace; font-size:6px; color:#A83A32; text-transform:uppercase; letter-spacing:.1em;}
+
+  /* ============ THEME: PIPES ============ */
+  body.theme-pipes{ background:#2B2117; color:#EFE6D6; }
+  .pipes-panel{width:100%; max-width:520px; padding:0 16px;}
+  .pipes-card{background:#3A2E20; border:3px solid #1A1410; border-radius:4px; padding:22px 20px; margin-bottom:16px;}
+  .pipes-wordmark{font-family:'Press Start 2P',monospace; font-size:17px; color:#EFE6D6; text-align:center; line-height:1.6;}
+  .pipes-wordmark .accent{color:#E8A33D;}
+  .pipes-lede{font-family:'IBM Plex Sans',sans-serif; font-size:13.5px; color:#C9BBA3; line-height:1.55; margin:14px 0 16px; text-align:center;}
+  .pipes-rules{list-style:none; padding:0; margin:0 0 18px; font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:#C9BBA3;}
+  .pipes-rules li{padding:5px 0; border-bottom:1px dashed #57493A;}
+  .pipes-rules li:last-child{border-bottom:none;}
+  .pipes-field-label{display:block; font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:#9A8B72; margin-bottom:6px; font-family:'IBM Plex Mono',monospace;}
+  .pipes-input{
+    width:100%; padding:13px 14px; font-size:16px; border-radius:2px;
+    border:2px solid #1A1410; background:#EFE6D6; color:#2B2117; outline:none; margin-bottom:14px;
+  }
+  .pipes-input:focus{border-color:#E8A33D;}
+  .btn-pipes-primary{
+    width:100%; border:3px solid #1A1410; border-radius:2px; padding:14px; font-weight:700; font-size:13px;
+    background:#E8A33D; color:#1A1410; font-family:'Press Start 2P',monospace;
+  }
+  .btn-pipes-primary:disabled{opacity:.4;}
+  .btn-pipes-ghost{
+    width:100%; border:2px solid #57493A; border-radius:2px; padding:12px; font-weight:600; font-size:11px;
+    background:transparent; color:#C9BBA3; font-family:'Press Start 2P',monospace; margin-top:8px;
+  }
+
+  .pipes-head{width:100%; max-width:520px; padding:0 16px; display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;}
+  .arcade-counter{background:#1A1410; border:2px solid #000; border-radius:2px; padding:6px 10px; box-shadow:inset 0 0 0 2px #4A3B29;}
+  .arcade-counter b{font-family:'Press Start 2P',monospace; font-size:13px; color:#E8A33D;}
+  .arcade-counter span{font-family:'Press Start 2P',monospace; font-size:8px; color:#9A8B72; display:block; margin-bottom:3px;}
+
+  .hazard-frame{width:100%; max-width:480px; padding:8px; background:repeating-linear-gradient(45deg, #E8A33D 0 12px, #1A1410 12px 24px); border-radius:4px; margin:0 16px 14px;}
+  .board-wrap{width:100%; aspect-ratio:1/1; position:relative; background:#241C13; border-radius:2px; overflow:hidden;}
+  .grid{position:absolute; inset:0; display:grid;}
+  .cell{position:relative; border:1px solid rgba(0,0,0,.3);}
+  .cell.blank{background:repeating-linear-gradient(135deg, #201808, #201808 6px, #291F0D 6px, #291F0D 12px);}
+  .cell.pipe{background:#171009;}
+
+  .pipe-inner{position:absolute; inset:0; transition:transform .2s steps(1);}
+  .pipe-hub{position:absolute; top:32%; left:32%; width:36%; height:36%; border-radius:50%; background:#8A8A8A; border:2px solid #000; z-index:2;}
+  .pipe-hub::after{content:""; position:absolute; inset:28%; border-radius:50%; background:#5C5C5C;}
+  .pipe-arm{position:absolute; background:#8A8A8A; border:2px solid #000; z-index:1;}
+  .pipe-arm::after{content:""; position:absolute; background:#B8B8B8;}
+  .arm-N{top:-2px; left:38%; width:24%; height:54%;}
+  .arm-N::after{top:4px; left:22%; width:56%; height:6px;}
+  .arm-S{bottom:-2px; left:38%; width:24%; height:54%;}
+  .arm-S::after{bottom:4px; left:22%; width:56%; height:6px;}
+  .arm-E{right:-2px; top:38%; height:24%; width:54%;}
+  .arm-E::after{right:4px; top:22%; height:56%; width:6px;}
+  .arm-W{left:-2px; top:38%; height:24%; width:54%;}
+  .arm-W::after{left:4px; top:22%; height:56%; width:6px;}
+
+  .cell.solved .pipe-hub, .cell.solved .pipe-arm{background:#4F9C55; border-color:#0B1E0C;}
+  .cell.solved .pipe-arm::after, .cell.solved .pipe-hub::after{background:#7ED187;}
+
+  .endpoint-icon{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; z-index:3; pointer-events:none;}
+  .valve-icon{width:46%; height:46%; border-radius:50%; background:#E8A33D; border:2px solid #000; position:relative;}
+  .valve-icon::before,.valve-icon::after{content:""; position:absolute; background:#1A1410; top:50%; left:50%; transform:translate(-50%,-50%);}
+  .valve-icon::before{width:70%; height:14%;}
+  .valve-icon::after{width:14%; height:70%;}
+  .bullseye-icon{width:50%; height:50%; border-radius:50%; background:#D9392B; border:2px solid #000; display:flex; align-items:center; justify-content:center;}
+  .bullseye-icon::before{content:""; width:55%; height:55%; border-radius:50%; background:#EFE6D6; border:2px solid #000; display:block;}
+
+  .pipes-toast{position:relative; width:100%; text-align:center; margin:0 0 10px; font-family:'Press Start 2P',monospace; font-size:11px; color:#4F9C55; opacity:0; transition:opacity .2s ease;}
+  .pipes-toast.show{opacity:1;}
+
+  /* ============ shared overlay ============ */
+  .overlay{position:fixed; inset:0; background:rgba(0,0,0,.78); display:none; align-items:center; justify-content:center; z-index:50; padding:20px;}
+  .overlay.active{display:flex;}
+  .win-card{width:100%; max-width:380px; text-align:center; border-radius:4px; padding:26px 22px;}
+  .win-card.simon-win{background:#FFFDF7; border:3px solid #2A2620;}
+  .win-card.pipes-win{background:#3A2E20; border:3px solid #1A1410;}
+  .win-title{font-size:19px; margin-bottom:8px;}
+  .simon-win .win-title{font-family:'Fredoka',sans-serif; color:#D9392B;}
+  .pipes-win .win-title{font-family:'Press Start 2P',monospace; font-size:14px; color:#E8A33D; line-height:1.5;}
+  .win-sub{font-size:13px; margin-bottom:18px; font-family:'IBM Plex Sans',sans-serif;}
+  .simon-win .win-sub{color:#5A5348;}
+  .pipes-win .win-sub{color:#C9BBA3;}
+  .win-stats{display:flex; justify-content:center; gap:22px; margin-bottom:20px;}
+  .win-stat b{display:block; font-size:22px; font-family:'IBM Plex Mono',monospace;}
+  .simon-win .win-stat b{color:#D9392B;}
+  .pipes-win .win-stat b{color:#4F9C55; font-family:'Press Start 2P',monospace; font-size:16px;}
+  .win-stat span{font-size:10px; text-transform:uppercase; letter-spacing:.06em;}
+  .simon-win .win-stat span{color:#8A8272;}
+  .pipes-win .win-stat span{color:#9A8B72;}
+
+  /* ============ LEADERBOARD view ============ */
+  .lb-section{width:100%; max-width:900px; padding:0 16px; display:flex; flex-wrap:wrap; justify-content:center; gap:24px;}
+  .lb-column{flex:1 1 280px; min-width:0; max-width:420px;}
+  .lb-title{font-family:'Anton', Impact, sans-serif; font-size:20px; margin:18px 0 8px; color:#F4F4F8;}
+  .lb-panel{background:#15151C; border:2px solid #26262F; border-radius:6px; padding:8px 16px; margin-bottom:8px;}
+  .lb-row{display:flex; justify-content:space-between; align-items:center; padding:9px 2px; border-bottom:1px dashed #26262F; font-size:14px;}
+  .lb-row:last-child{border-bottom:none;}
+  .lb-rank{color:#C9A227; width:24px; font-family:'IBM Plex Mono',monospace; font-weight:700;}
+  .lb-name{flex:1; padding:0 8px; color:#EDEDF2;}
+  .lb-score{color:#8DE0A0; font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:13px;}
+  .lb-empty{color:#6F6F80; font-size:13px; padding:10px 2px;}
+
+  /* ============ ADMIN view (terminal look) ============ */
+  body.theme-admin{ background:#050705; color:#5FF07A; }
+  .admin-term{width:100%; max-width:520px; padding:0 16px; font-family:'IBM Plex Mono',monospace;}
+  .admin-title{font-size:16px; margin:10px 0 18px; color:#8DFFA0;}
+  .admin-title::before{content:"> "; }
+  .admin-row{display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px dashed #123312; font-size:13px;}
+  .admin-actions{display:flex; flex-direction:column; gap:10px; margin-top:20px;}
+  .btn-admin{
+    background:transparent; border:1.5px solid #2E8B3A; color:#8DFFA0; border-radius:2px;
+    padding:13px; font-size:12.5px; font-family:'IBM Plex Mono',monospace; text-align:left;
+  }
+  .btn-admin:active{background:#0D2010;}
+  .btn-admin.danger{border-color:#E0473A; color:#FF8A7D;}
+  .admin-msg{margin-top:14px; font-size:12px; color:#8DFFA0; min-height:16px;}
+</style>
+</head>
+<body class="theme-hub">
+
+<!-- ===================== HUB ===================== -->
+<div class="view active" id="viewHub">
+  <div class="appbar">
+    <button class="btn-nav invisible">← Atrás</button>
+    <div class="appbar-spacer"></div>
+    <button class="btn-nav" id="fsBtnHub" style="background:transparent;border:1.5px solid #2A2A35;color:#CFCFDA;">⛶ Pantalla completa</button>
+  </div>
+  <div class="marquee">
+    <div class="marquee-inner">
+      <div class="marquee-eyebrow">Feria Vocacional</div>
+      <div class="marquee-title">INGENIERÍA EN<br>COMPUTACIÓN</div>
+      <div class="marquee-sub">TEC · CAMPUS CARLOS</div>
+    </div>
+  </div>
+  <div class="game-picks">
+    <div class="pick-card" id="goSimon">
+      <div class="pick-swatch simon-swatch"><div></div><div></div><div></div><div></div></div>
+      <div class="pick-text">
+        <div class="pick-title">SIMÓN DICE</div>
+        <div class="pick-desc">Memoriza y repite la secuencia de colores. Cada ronda suma un paso más.</div>
+      </div>
+      <div class="pick-arrow">▶</div>
+    </div>
+    <div class="pick-card" id="goPipes">
+      <div class="pick-swatch pipes-swatch"><div class="pipe-demo"></div></div>
+      <div class="pick-text">
+        <div class="pick-title">CONECTA EL CIRCUITO</div>
+        <div class="pick-desc">Gira las tuberías y conecta el inicio con la meta.</div>
+      </div>
+      <div class="pick-arrow">▶</div>
+    </div>
+  </div>
+  <div class="hub-secondary">
+    <button class="btn-outline-hub" id="goLeaderboard">🏆 Ver marcadores</button>
+  </div>
+  <a href="#admin" class="admin-link">admin</a>
+</div>
+
+<!-- ===================== SIMON ===================== -->
+<div class="view" id="viewSimon">
+  <div class="appbar">
+    <button class="btn-nav" data-back style="background:transparent;border:1.5px solid #2A2620;color:#2A2620;">← Atrás</button>
+    <div class="appbar-spacer"></div>
+    <button class="btn-nav" id="fsBtnSimon" style="background:transparent;border:1.5px solid #2A2620;color:#2A2620;">⛶</button>
+  </div>
+
+  <!-- name entry -->
+  <div class="simon-card" id="simonNameScreen">
+    <div class="simon-panel">
+      <div class="simon-wordmark">SIM<span class="accent">Ó</span>N DICE</div>
+      <p class="simon-lede">Observa la secuencia de colores y repítela tocando en el mismo orden. Cada ronda se agrega un color más.</p>
+      <ul class="simon-rules">
+        <li>1 — Mira bien la secuencia que se enciende</li>
+        <li>2 — Repítela tocando los colores en orden</li>
+        <li>3 — Un error termina la partida</li>
+      </ul>
+      <label class="simon-field-label" for="simonNameInput">Tu nombre</label>
+      <input type="text" class="simon-input" id="simonNameInput" placeholder="Ej. María, colegio..." maxlength="24" autocomplete="off">
+      <button class="btn-simon-primary" id="simonStartBtn" disabled>COMENZAR</button>
+    </div>
+  </div>
+
+  <!-- play -->
+  <div class="simon-card hidden" id="simonPlayScreen">
+    <div class="pipes-head" style="max-width:none; padding:0;">
+      <div class="arcade-counter" style="background:#FFFDF7;border:2px solid #2A2620;box-shadow:none;">
+        <span style="color:#8A8272;">RONDA</span><b style="color:#D9392B; font-family:'IBM Plex Mono',monospace;" id="roundNum">1</b>
+      </div>
+      <div class="arcade-counter" style="background:#FFFDF7;border:2px solid #2A2620;box-shadow:none;">
+        <span style="color:#8A8272;">MEJOR HOY</span><b style="color:#2A2620; font-family:'IBM Plex Mono',monospace;" id="bestToday">—</b>
+      </div>
+    </div>
+    <p class="simon-status" id="statusText">Prepárate…</p>
+    <div class="saucer-wrap">
+      <div class="saucer-housing">
+        <div class="saucer-ring">
+          <div class="pad-grid">
+            <button class="pad pad-green" data-color="green"></button>
+            <button class="pad pad-red" data-color="red"></button>
+            <button class="pad pad-yellow" data-color="yellow"></button>
+            <button class="pad pad-blue" data-color="blue"></button>
+          </div>
+        </div>
+      </div>
+      <div class="saucer-center">
+        <div class="led-display"><span>ronda</span><b id="badgeNum">1</b></div>
+      </div>
+    </div>
+    <button class="btn-simon-ghost" id="btnReplay" disabled>REPETIR SECUENCIA</button>
+  </div>
+
+  <!-- final -->
+  <div class="simon-card hidden" id="simonFinalScreen">
+    <div class="simon-panel" style="text-align:center;">
+      <div class="simon-wordmark" style="font-size:22px;">CADENA ROTA</div>
+      <p class="simon-lede" id="simonFinalSummary"></p>
+      <button class="btn-simon-primary" id="simonPlayAgainBtn">JUGAR DE NUEVO</button>
+      <button class="btn-simon-ghost" id="simonToLeaderboardBtn">VER MARCADORES</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== PIPES ===================== -->
+<div class="view" id="viewPipes">
+  <div class="appbar">
+    <button class="btn-nav" data-back style="background:transparent;border:1.5px solid #EFE6D6;color:#EFE6D6;">← Atrás</button>
+    <div class="appbar-spacer"></div>
+    <button class="btn-nav" id="fsBtnPipes" style="background:transparent;border:1.5px solid #EFE6D6;color:#EFE6D6;">⛶</button>
+  </div>
+
+  <!-- name entry -->
+  <div class="pipes-panel" id="pipesNameScreen">
+    <div class="pipes-card">
+      <div class="pipes-wordmark">CONECTA EL<br><span class="accent">CIRCUITO</span></div>
+      <p class="pipes-lede">Toca una tubería para girarla 90°. Conecta el inicio con la meta formando un camino continuo.</p>
+      <ul class="pipes-rules">
+        <li>1 — Tocar una pieza la gira 90°</li>
+        <li>2 — Conecta la válvula con el blanco</li>
+        <li>3 — Menos giros, mejor puntaje</li>
+      </ul>
+      <label class="pipes-field-label" for="pipesNameInput">Tu nombre</label>
+      <input type="text" class="pipes-input" id="pipesNameInput" placeholder="Ej. María, colegio..." maxlength="24" autocomplete="off">
+      <button class="btn-pipes-primary" id="pipesStartBtn" disabled>COMENZAR</button>
+    </div>
+  </div>
+
+  <!-- play -->
+  <div class="hidden" id="pipesPlayScreen" style="width:100%; display:flex; flex-direction:column; align-items:center;">
+    <div class="pipes-head">
+      <div class="arcade-counter"><span>NIVEL</span><b id="lvlNum">1</b><span style="display:inline;font-size:8px;">/3</span></div>
+      <div class="arcade-counter"><span>GIROS</span><b id="turnCount">0</b></div>
+    </div>
+    <div class="pipes-toast" id="toast">¡CONECTADO!</div>
+    <div class="hazard-frame">
+      <div class="board-wrap">
+        <div class="grid" id="grid"></div>
+      </div>
+    </div>
+    <div class="pipes-panel" style="padding:0; border:none; background:none; max-width:480px; margin:0 16px;">
+      <button class="btn-pipes-ghost" id="btnShuffle">REVOLVER DE NUEVO</button>
+    </div>
+  </div>
+
+  <!-- final -->
+  <div class="pipes-panel hidden" id="pipesFinalScreen">
+    <div class="pipes-card" style="text-align:center;">
+      <div class="pipes-wordmark" style="font-size:16px;">RED COMPLETA</div>
+      <p class="pipes-lede" id="pipesFinalSummary"></p>
+      <button class="btn-pipes-primary" id="pipesPlayAgainBtn">JUGAR DE NUEVO</button>
+      <button class="btn-pipes-ghost" id="pipesToLeaderboardBtn">VER MARCADORES</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== LEADERBOARD ===================== -->
+<div class="view" id="viewLeaderboard">
+  <div class="appbar">
+    <button class="btn-nav" data-back style="background:transparent;border:1.5px solid #2A2A35;color:#CFCFDA;">← Atrás</button>
+    <div class="appbar-spacer"></div>
+    <button class="btn-nav" id="fsBtnLb" style="background:transparent;border:1.5px solid #2A2A35;color:#CFCFDA;">⛶</button>
+  </div>
+  <div class="lb-section">
+    <div class="lb-column">
+      <div class="lb-title">SIMÓN DICE — mejores rachas</div>
+      <div class="lb-panel"><div id="lbSimon"><div class="lb-empty">Aún no hay puntajes en esta iPad.</div></div></div>
+    </div>
+    <div class="lb-column">
+      <div class="lb-title">CONECTA EL CIRCUITO — menos giros</div>
+      <div class="lb-panel"><div id="lbPipes"><div class="lb-empty">Aún no hay puntajes en esta iPad.</div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== ADMIN ===================== -->
+<div class="view" id="viewAdmin">
+  <div class="appbar">
+    <button class="btn-nav" data-back style="background:transparent;border:1.5px solid #2E8B3A;color:#8DFFA0;">← Inicio</button>
+    <div class="appbar-spacer"></div>
+  </div>
+  <div class="admin-term">
+    <div class="admin-title">panel de administracion</div>
+    <div class="admin-row"><span>Simón Dice — puntajes guardados</span><b id="adminSimonCount">0</b></div>
+    <div class="admin-row"><span>Conecta el Circuito — puntajes guardados</span><b id="adminPipesCount">0</b></div>
+    <div class="admin-actions">
+      <button class="btn-admin danger" id="btnClearSimon">limpiar tabla simon dice</button>
+      <button class="btn-admin danger" id="btnClearPipes">limpiar tabla conecta el circuito</button>
+      <button class="btn-admin danger" id="btnClearAll">limpiar todos los datos</button>
+    </div>
+    <div class="admin-msg" id="adminMsg"></div>
+  </div>
+</div>
+
+<!-- ===================== overlays ===================== -->
+<div class="overlay" id="simonOverlayNone"></div>
+<div class="overlay" id="pipesOverlay">
+  <div class="win-card pipes-win">
+    <div class="win-title" id="pipesOverlayTitle">¡CIRCUITO CONECTADO!</div>
+    <div class="win-sub" id="pipesOverlaySub">La señal llegó a la meta.</div>
+    <div class="win-stats">
+      <div class="win-stat"><b id="pipesOverlayTurns">0</b><span>Giros</span></div>
+      <div class="win-stat"><b id="pipesOverlayLevel">1/3</b><span>Nivel</span></div>
+    </div>
+    <button class="btn-pipes-primary" id="pipesOverlayNextBtn">SIGUIENTE NIVEL</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  // ================= navigation / shared chrome =================
+  const $ = id => document.getElementById(id);
+  const views = ['Hub','Simon','Pipes','Leaderboard','Admin'];
+
+  function showView(name){
+    views.forEach(v=> $('view'+v).classList.remove('active'));
+    $('view'+name).classList.add('active');
+    document.body.className = 'theme-' + name.toLowerCase();
+    if(name !== 'Simon') simonAbort = true;
+    window.scrollTo(0,0);
+  }
+
+  function goHub(){
+    if(location.hash === '#admin') history.replaceState(null,'',location.pathname+location.search);
+    showView('Hub');
+  }
+
+  document.querySelectorAll('[data-back]').forEach(b=> b.addEventListener('click', goHub));
+
+  $('goSimon').addEventListener('click', ()=>{ showView('Simon'); resetSimonToName(); });
+  $('goPipes').addEventListener('click', ()=>{ showView('Pipes'); resetPipesToName(); });
+  $('goLeaderboard').addEventListener('click', ()=>{ showView('Leaderboard'); renderLeaderboards(); });
+  $('simonToLeaderboardBtn').addEventListener('click', ()=>{ showView('Leaderboard'); renderLeaderboards(); });
+  $('pipesToLeaderboardBtn').addEventListener('click', ()=>{ showView('Leaderboard'); renderLeaderboards(); });
+
+  function checkHashRoute(){
+    if(location.hash === '#admin'){ showView('Admin'); renderAdmin(); }
+  }
+  window.addEventListener('hashchange', checkHashRoute);
+  checkHashRoute();
+
+  // ---- fullscreen toggle (works on iPadOS Safari; degrades quietly elsewhere) ----
+  function toggleFullscreen(){
+    const isFs = document.fullscreenElement || document.webkitFullscreenElement;
+    try{
+      if(!isFs){
+        const el = document.documentElement;
+        const req = el.requestFullscreen || el.webkitRequestFullscreen;
+        if(req) req.call(el);
+      } else {
+        const exit = document.exitFullscreen || document.webkitExitFullscreen;
+        if(exit) exit.call(document);
+      }
+    }catch(e){ /* fullscreen not supported here, ignore */ }
+  }
+  ['fsBtnHub','fsBtnSimon','fsBtnPipes','fsBtnLb'].forEach(id=>{
+    const btn = $(id);
+    if(btn) btn.addEventListener('click', toggleFullscreen);
+  });
+
+  function tickClock(){}
+
+  // ================= local storage helpers =================
+  const LS_SIMON = 'tec_feria_simon_scores';
+  const LS_PIPES = 'tec_feria_pipes_scores';
+
+  function loadScores(key){
+    try{ const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : []; }
+    catch(e){ return []; }
+  }
+  function saveScores(key, list){
+    try{ localStorage.setItem(key, JSON.stringify(list)); }catch(e){ /* storage unavailable */ }
+  }
+  function addScore(key, entry, cmp){
+    const list = loadScores(key);
+    list.push(entry);
+    list.sort(cmp);
+    saveScores(key, list.slice(0,50));
+  }
+  function escapeHtml(s){
+    return s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  }
+
+  function renderLeaderboards(){
+    const simonList = loadScores(LS_SIMON);
+    const pipesList = loadScores(LS_PIPES);
+    $('lbSimon').innerHTML = simonList.length ? simonList.slice(0,10).map((e,i)=>
+      '<div class="lb-row"><span class="lb-rank">'+(i+1)+'</span><span class="lb-name">'+escapeHtml(e.name)+'</span><span class="lb-score">ronda '+e.rounds+' · '+e.seconds+'s</span></div>'
+    ).join('') : '<div class="lb-empty">Aún no hay puntajes en esta iPad.</div>';
+    $('lbPipes').innerHTML = pipesList.length ? pipesList.slice(0,10).map((e,i)=>
+      '<div class="lb-row"><span class="lb-rank">'+(i+1)+'</span><span class="lb-name">'+escapeHtml(e.name)+'</span><span class="lb-score">'+e.turns+' giros · '+e.seconds+'s</span></div>'
+    ).join('') : '<div class="lb-empty">Aún no hay puntajes en esta iPad.</div>';
+  }
+
+  // ================= ADMIN =================
+  function renderAdmin(){
+    $('adminSimonCount').textContent = loadScores(LS_SIMON).length;
+    $('adminPipesCount').textContent = loadScores(LS_PIPES).length;
+    $('adminMsg').textContent = '';
+  }
+  $('btnClearSimon').addEventListener('click', ()=>{
+    if(confirm('¿Borrar todos los puntajes de Simón Dice en esta iPad?')){
+      localStorage.removeItem(LS_SIMON);
+      renderAdmin();
+      $('adminMsg').textContent = 'Tabla de Simón Dice borrada.';
+    }
+  });
+  $('btnClearPipes').addEventListener('click', ()=>{
+    if(confirm('¿Borrar todos los puntajes de Conecta el Circuito en esta iPad?')){
+      localStorage.removeItem(LS_PIPES);
+      renderAdmin();
+      $('adminMsg').textContent = 'Tabla de Conecta el Circuito borrada.';
+    }
+  });
+  $('btnClearAll').addEventListener('click', ()=>{
+    if(confirm('¿Borrar TODOS los datos guardados en esta iPad?')){
+      localStorage.removeItem(LS_SIMON);
+      localStorage.removeItem(LS_PIPES);
+      renderAdmin();
+      $('adminMsg').textContent = 'Todos los datos fueron borrados.';
+    }
+  });
+
+  // =====================================================================
+  // ============================= SIMÓN DICE ===========================
+  // =====================================================================
+  const COLORS = ['red','blue','green','yellow'];
+  const FREQS = {red:220.0, blue:392.0, green:329.63, yellow:261.63};
+
+  let simonPlayerName = "";
+  let sequence = [];
+  let completedRounds = 0;
+  let playerStep = 0;
+  let accepting = false;
+  let simonStartTime = null;
+  let audioCtx = null;
+  let simonAbort = false;
+
+  function resetSimonToName(){
+    simonAbort = true;
+    $('simonNameScreen').classList.remove('hidden');
+    $('simonPlayScreen').classList.add('hidden');
+    $('simonFinalScreen').classList.add('hidden');
+    $('simonNameInput').value = '';
+    $('simonStartBtn').disabled = true;
+  }
+
+  $('simonNameInput').addEventListener('input', e=>{
+    $('simonStartBtn').disabled = e.target.value.trim().length === 0;
+  });
+  $('simonNameInput').addEventListener('keydown', e=>{
+    if(e.key === 'Enter' && !$('simonStartBtn').disabled) $('simonStartBtn').click();
+  });
+  $('simonStartBtn').addEventListener('click', ()=>{
+    simonPlayerName = $('simonNameInput').value.trim().slice(0,24) || 'Jugador';
+    $('simonNameScreen').classList.add('hidden');
+    $('simonPlayScreen').classList.remove('hidden');
+    startSimonGame();
+  });
+  $('simonPlayAgainBtn').addEventListener('click', resetSimonToName);
+
+  function sleep(ms){ return new Promise(res=>setTimeout(res, ms)); }
+
+  function ensureAudio(){
+    if(!audioCtx){
+      try{ audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ audioCtx = null; }
+    }
+  }
+  function playTone(freq, durMs){
+    if(!audioCtx) return;
+    try{
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.type = 'sine';
+      o.frequency.value = freq;
+      g.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.28, audioCtx.currentTime+0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime+durMs/1000);
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start();
+      o.stop(audioCtx.currentTime + durMs/1000 + 0.03);
+    }catch(e){ /* ignore audio errors */ }
+  }
+
+  function padEl(color){ return document.querySelector('.pad[data-color="'+color+'"]'); }
+  function flashPanel(color, durMs){
+    const el = padEl(color);
+    if(!el) return;
+    el.classList.add('active');
+    playTone(FREQS[color], durMs);
+    setTimeout(()=> el.classList.remove('active'), durMs);
+  }
+
+  function startSimonGame(){
+    ensureAudio();
+    simonAbort = false;
+    sequence = [];
+    completedRounds = 0;
+    simonStartTime = Date.now();
+    const best = loadScores(LS_SIMON);
+    $('bestToday').textContent = best.length ? best[0].rounds : '—';
+    nextRound();
+  }
+
+  function nextRound(){
+    sequence.push(COLORS[Math.floor(Math.random()*COLORS.length)]);
+    playerStep = 0;
+    $('roundNum').textContent = sequence.length;
+    $('badgeNum').textContent = sequence.length;
+    $('btnReplay').disabled = true;
+    setStatus('Observa la secuencia…', false);
+    setTimeout(()=>{ if(!simonAbort) playSequence(sequence); }, 550);
+  }
+
+  async function playSequence(seq){
+    accepting = false;
+    $('btnReplay').disabled = true;
+    for(const c of seq){
+      if(simonAbort) return;
+      flashPanel(c, 420);
+      await sleep(420);
+      if(simonAbort) return;
+      await sleep(180);
+    }
+    if(simonAbort) return;
+    accepting = true;
+    $('btnReplay').disabled = false;
+    setStatus('¡Tu turno! Repite la secuencia', true);
+  }
+
+  function onPanelTap(color){
+    if(!accepting || simonAbort) return;
+    flashPanel(color, 220);
+    if(sequence[playerStep] !== color){
+      accepting = false;
+      gameOver();
+      return;
+    }
+    playerStep++;
+    if(playerStep === sequence.length){
+      completedRounds = sequence.length;
+      accepting = false;
+      $('btnReplay').disabled = true;
+      setStatus('¡Bien! Preparando siguiente ronda…', false);
+      setTimeout(()=>{ if(!simonAbort) nextRound(); }, 700);
+    }
+  }
+  document.querySelectorAll('.pad').forEach(p=> p.addEventListener('click', ()=> onPanelTap(p.dataset.color)));
+  $('btnReplay').addEventListener('click', ()=>{ if(accepting) playSequence(sequence); });
+
+  function setStatus(text, yourTurn){
+    const el = $('statusText');
+    el.textContent = text;
+    el.classList.toggle('your-turn', !!yourTurn);
+  }
+
+  function gameOver(){
+    setStatus('¡Se rompió la cadena!', false);
+    playTone(110, 500);
+    document.querySelectorAll('.pad').forEach(p=> p.classList.add('active'));
+    setTimeout(()=>{
+      document.querySelectorAll('.pad').forEach(p=> p.classList.remove('active'));
+      finishSimonRun();
+    }, 650);
+  }
+
+  function finishSimonRun(){
+    const seconds = Math.round((Date.now()-simonStartTime)/1000);
+    $('simonFinalSummary').innerHTML = '<b>'+escapeHtml(simonPlayerName)+'</b>, llegaste a la ronda <b>'+completedRounds+'</b> en '+seconds+'s.';
+    $('simonPlayScreen').classList.add('hidden');
+    $('simonFinalScreen').classList.remove('hidden');
+    addScore(LS_SIMON, {name:simonPlayerName, rounds:completedRounds, seconds, ts:Date.now()}, (a,b)=> b.rounds-a.rounds || a.seconds-b.seconds);
+  }
+
+  // =====================================================================
+  // ========================= CONECTA EL CIRCUITO ======================
+  // =====================================================================
+  const DIR_ORDER = ['N','E','S','W'];
+  const DIR_VEC = { N:{dr:-1,dc:0}, E:{dr:0,dc:1}, S:{dr:1,dc:0}, W:{dr:0,dc:-1} };
+  const OPPOSITE = { N:'S', S:'N', E:'W', W:'E' };
+  function rotateDir(dir, steps){
+    const i = DIR_ORDER.indexOf(dir);
+    return DIR_ORDER[(i + steps + 400) % 4];
+  }
+  function dirBetween(a, b){
+    const dr = b[0]-a[0], dc = b[1]-a[1];
+    for(const d of DIR_ORDER){ if(DIR_VEC[d].dr===dr && DIR_VEC[d].dc===dc) return d; }
+    return null;
+  }
+
+  const PIPE_LEVELS = [
+    { n:5, minLen:6,  maxLen:9  },
+    { n:6, minLen:9,  maxLen:13 },
+    { n:7, minLen:13, maxLen:18 },
+  ];
+
+  let pipesPlayerName = "";
+  let curLevel = 0;
+  let gridSize = 5;
+  let path = [];
+  let cellBase = {};
+  let cellRot = {};
+  let totalTurns = 0;
+  let pipesRunning = false;
+  let pipesStartTime = null;
+
+  function resetPipesToName(){
+    $('pipesNameScreen').classList.remove('hidden');
+    $('pipesPlayScreen').classList.add('hidden');
+    $('pipesFinalScreen').classList.add('hidden');
+    $('pipesNameInput').value = '';
+    $('pipesStartBtn').disabled = true;
+  }
+
+  $('pipesNameInput').addEventListener('input', e=>{
+    $('pipesStartBtn').disabled = e.target.value.trim().length === 0;
+  });
+  $('pipesNameInput').addEventListener('keydown', e=>{
+    if(e.key === 'Enter' && !$('pipesStartBtn').disabled) $('pipesStartBtn').click();
+  });
+  $('pipesStartBtn').addEventListener('click', ()=>{
+    pipesPlayerName = $('pipesNameInput').value.trim().slice(0,24) || 'Jugador';
+    $('pipesNameScreen').classList.add('hidden');
+    $('pipesPlayScreen').classList.remove('hidden');
+    curLevel = 0; totalTurns = 0; pipesStartTime = Date.now();
+    loadPipesLevel(0);
+  });
+  $('pipesPlayAgainBtn').addEventListener('click', resetPipesToName);
+
+  function buildPath(n, minLen, maxLen){
+    const targetLen = minLen + Math.floor(Math.random()*(maxLen-minLen+1));
+    for(let attempt=0; attempt<300; attempt++){
+      const visited = new Set();
+      const p = [];
+      let r = Math.floor(Math.random()*n), c = Math.floor(Math.random()*n);
+      p.push([r,c]); visited.add(r+','+c);
+      let stuck = false;
+      while(p.length < targetLen && !stuck){
+        const [cr,cc] = p[p.length-1];
+        const options = DIR_ORDER
+          .map(d=>({r:cr+DIR_VEC[d].dr, c:cc+DIR_VEC[d].dc}))
+          .filter(pt=> pt.r>=0 && pt.r<n && pt.c>=0 && pt.c<n && !visited.has(pt.r+','+pt.c));
+        if(options.length===0){ stuck = true; break; }
+        const pick = options[Math.floor(Math.random()*options.length)];
+        p.push([pick.r,pick.c]);
+        visited.add(pick.r+','+pick.c);
+      }
+      if(p.length >= minLen) return p;
+    }
+    const len = Math.min(minLen, n);
+    const p = [];
+    for(let i=0;i<len;i++) p.push([0,i]);
+    return p;
+  }
+
+  function loadPipesLevel(idx){
+    const cfg = PIPE_LEVELS[idx];
+    gridSize = cfg.n;
+    path = buildPath(cfg.n, cfg.minLen, cfg.maxLen);
+    cellBase = {}; cellRot = {};
+    path.forEach((cell, i)=>{
+      const dirs = [];
+      if(i>0) dirs.push(dirBetween(cell, path[i-1]));
+      if(i<path.length-1) dirs.push(dirBetween(cell, path[i+1]));
+      cellBase[cell[0]+','+cell[1]] = dirs;
+      cellRot[cell[0]+','+cell[1]] = Math.floor(Math.random()*4);
+    });
+    pipesRunning = false;
+    $('lvlNum').textContent = (idx+1);
+    $('turnCount').textContent = totalTurns;
+    buildPipesGrid();
+  }
+
+  function openDirsFor(key){ return cellBase[key].map(d=> rotateDir(d, cellRot[key])); }
+
+  function isPipesSolved(){
+    for(let i=0;i<path.length-1;i++){
+      const a = path[i], b = path[i+1];
+      const keyA = a[0]+','+a[1], keyB = b[0]+','+b[1];
+      const dirAB = dirBetween(a,b);
+      const openA = openDirsFor(keyA), openB = openDirsFor(keyB);
+      if(openA.indexOf(dirAB) === -1) return false;
+      if(openB.indexOf(OPPOSITE[dirAB]) === -1) return false;
+    }
+    return true;
+  }
+
+  function buildPipesGrid(){
+    const grid = $('grid');
+    grid.innerHTML = '';
+    grid.style.gridTemplateColumns = 'repeat('+gridSize+', 1fr)';
+    grid.style.gridTemplateRows = 'repeat('+gridSize+', 1fr)';
+    const pathSet = {};
+    path.forEach(c=> pathSet[c[0]+','+c[1]] = true);
+
+    for(let r=0;r<gridSize;r++){
+      for(let c=0;c<gridSize;c++){
+        const key = r+','+c;
+        const cell = document.createElement('div');
+        cell.dataset.key = key;
+        if(pathSet[key]){
+          cell.className = 'cell pipe';
+          const inner = document.createElement('div');
+          inner.className = 'pipe-inner';
+          inner.style.transform = 'rotate('+(cellRot[key]*90)+'deg)';
+          const hub = document.createElement('div');
+          hub.className = 'pipe-hub';
+          inner.appendChild(hub);
+          cellBase[key].forEach(d=>{
+            const arm = document.createElement('div');
+            arm.className = 'pipe-arm arm-'+d;
+            inner.appendChild(arm);
+          });
+          cell.appendChild(inner);
+          if(r===path[0][0] && c===path[0][1]){
+            const icon = document.createElement('div');
+            icon.className = 'endpoint-icon';
+            icon.innerHTML = '<div class="valve-icon"></div>';
+            cell.appendChild(icon);
+          } else if(r===path[path.length-1][0] && c===path[path.length-1][1]){
+            const icon = document.createElement('div');
+            icon.className = 'endpoint-icon';
+            icon.innerHTML = '<div class="bullseye-icon"></div>';
+            cell.appendChild(icon);
+          }
+          cell.addEventListener('click', ()=> onPipeCellTap(key));
+        } else {
+          cell.className = 'cell blank';
+        }
+        grid.appendChild(cell);
+      }
+    }
+    updatePipesSolvedStyle();
+  }
+
+  function onPipeCellTap(key){
+    if(pipesRunning) return;
+    cellRot[key] = (cellRot[key] + 1) % 4;
+    totalTurns++;
+    $('turnCount').textContent = totalTurns;
+    const cellEl = document.querySelector('.cell[data-key="'+key+'"] .pipe-inner');
+    if(cellEl) cellEl.style.transform = 'rotate('+(cellRot[key]*90)+'deg)';
+    if(isPipesSolved()){
+      pipesRunning = true;
+      updatePipesSolvedStyle();
+      showPipesToast('¡CONECTADO!');
+      setTimeout(pipesLevelComplete, 500);
+    }
+  }
+
+  function updatePipesSolvedStyle(){
+    const solved = isPipesSolved();
+    path.forEach(c=>{
+      const el = document.querySelector('.cell[data-key="'+c[0]+','+c[1]+'"]');
+      if(el) el.classList.toggle('solved', solved);
+    });
+  }
+
+  function showPipesToast(msg){
+    const t = $('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'), 1400);
+  }
+
+  $('btnShuffle').addEventListener('click', ()=>{
+    if(pipesRunning) return;
+    path.forEach(c=>{ cellRot[c[0]+','+c[1]] = Math.floor(Math.random()*4); });
+    buildPipesGrid();
+  });
+
+  function pipesLevelComplete(){
+    const isLast = curLevel === PIPE_LEVELS.length-1;
+    $('pipesOverlayTitle').textContent = isLast ? '¡RETO COMPLETADO!' : '¡CIRCUITO CONECTADO!';
+    $('pipesOverlaySub').textContent = isLast ? 'Conectaste los tres circuitos.' : 'La señal llegó a la meta.';
+    $('pipesOverlayTurns').textContent = totalTurns;
+    $('pipesOverlayLevel').textContent = (curLevel+1)+'/'+PIPE_LEVELS.length;
+    $('pipesOverlayNextBtn').textContent = isLast ? 'VER RESULTADOS' : 'SIGUIENTE NIVEL';
+    $('pipesOverlay').classList.add('active');
+    $('pipesOverlayNextBtn').onclick = ()=>{
+      $('pipesOverlay').classList.remove('active');
+      if(isLast){ finishPipesRun(); }
+      else { curLevel++; loadPipesLevel(curLevel); }
+    };
+  }
+
+  function finishPipesRun(){
+    const seconds = Math.round((Date.now()-pipesStartTime)/1000);
+    $('pipesFinalSummary').innerHTML = '<b>'+escapeHtml(pipesPlayerName)+'</b>, conectaste los 3 circuitos en <b>'+totalTurns+'</b> giros y '+seconds+'s.';
+    $('pipesPlayScreen').classList.add('hidden');
+    $('pipesFinalScreen').classList.remove('hidden');
+    addScore(LS_PIPES, {name:pipesPlayerName, turns:totalTurns, seconds, ts:Date.now()}, (a,b)=> a.turns-b.turns || a.seconds-b.seconds);
+  }
+
+})();
+</script>
+</body>
+</html>

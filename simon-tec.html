@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>Simón Dice — Feria Vocacional TEC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=IBM+Plex+Mono:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#141418;
+    --bg2:#0B0B0E;
+    --panel:#1D1D24;
+    --chrome:#C9CDD6;
+    --chrome-light:#EDEFF4;
+    --accent:#37E7E0;
+    --alert:#FF5B5B;
+    --ink:#F1F1F5;
+    --ink-dim:#8E8E9B;
+    --red-dim:#5A1F22; --red-lit:#FF4D4D;
+    --blue-dim:#173A5E; --blue-lit:#3D8BFF;
+    --green-dim:#164B34; --green-lit:#2ECC71;
+    --yellow-dim:#5C4A12; --yellow-lit:#FFC93C;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{
+    margin:0; min-height:100vh;
+    background:
+      radial-gradient(ellipse at 15% -10%, #232330 0%, transparent 55%),
+      radial-gradient(ellipse at 100% 110%, #1A1A22 0%, transparent 55%),
+      var(--bg);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    display:flex; flex-direction:column; align-items:center;
+    padding:18px 14px 28px; overflow-x:hidden;
+  }
+  h1,h2,h3{font-family:'Baloo 2', sans-serif; margin:0;}
+  .mono{font-family:'IBM Plex Mono', monospace;}
+  button{font-family:inherit; cursor:pointer;}
+  ::selection{background:var(--accent); color:#04211f;}
+
+  .topbar{width:100%; max-width:560px; display:flex; align-items:baseline; justify-content:space-between; margin-bottom:10px;}
+  .brand{font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); font-family:'IBM Plex Mono',monospace;}
+  .title{font-size:24px; font-weight:700; color:var(--ink);}
+  .title span{color:var(--accent);}
+
+  .screen{width:100%; max-width:560px; display:none; flex-direction:column; align-items:center;}
+  .screen.active{display:flex;}
+
+  .card{
+    width:100%; background:linear-gradient(180deg, var(--panel), var(--bg2));
+    border:1px solid rgba(201,205,214,.18); border-radius:20px; padding:22px 20px;
+    box-shadow:0 10px 30px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.04);
+  }
+  .lede{color:var(--ink-dim); font-size:15px; line-height:1.55; margin:6px 0 18px;}
+  .lede b{color:var(--ink);}
+  .chip-row{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px;}
+  .chip{
+    display:flex; align-items:center; gap:6px;
+    background:rgba(55,231,224,.08); border:1px solid rgba(55,231,224,.35);
+    color:var(--accent); font-size:12.5px; padding:6px 10px; border-radius:999px;
+    font-family:'IBM Plex Mono',monospace;
+  }
+  label.field-label{display:block; font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-dim); margin-bottom:6px; font-family:'IBM Plex Mono',monospace;}
+  input[type=text]{
+    width:100%; padding:14px 14px; font-size:17px; border-radius:12px;
+    border:1.5px solid rgba(201,205,214,.35); background:var(--bg2); color:var(--ink);
+    outline:none; margin-bottom:16px; font-family:'IBM Plex Sans',sans-serif;
+  }
+  input[type=text]:focus{border-color:var(--accent); box-shadow:0 0 0 3px rgba(55,231,224,.18);}
+  .btn{border:none; border-radius:14px; padding:16px 20px; font-weight:700; font-size:16px; width:100%; transition:transform .12s ease, filter .12s ease;}
+  .btn:active{transform:scale(.97);}
+  .btn-primary{background:linear-gradient(180deg, var(--accent), #21B7B0); color:#04211f; box-shadow:0 6px 18px rgba(55,231,224,.3);}
+  .btn-primary:disabled{filter:grayscale(.6) opacity(.5); box-shadow:none;}
+  .btn-ghost{background:transparent; color:var(--ink-dim); border:1.5px solid rgba(241,241,245,.2);}
+  .btn-ghost:disabled{opacity:.4;}
+
+  .preview-title{font-size:12px; text-transform:uppercase; letter-spacing:.1em; color:var(--ink-dim); margin:20px 0 8px; font-family:'IBM Plex Mono',monospace;}
+  .lb-row{display:flex; justify-content:space-between; align-items:center; padding:9px 4px; border-bottom:1px dashed rgba(201,205,214,.18); font-size:14.5px;}
+  .lb-row:last-child{border-bottom:none;}
+  .lb-rank{color:var(--yellow-lit); width:22px; font-family:'IBM Plex Mono',monospace; font-weight:700;}
+  .lb-name{flex:1; padding:0 8px; color:var(--ink);}
+  .lb-score{color:var(--accent); font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:13.5px;}
+  .lb-empty{color:var(--ink-dim); font-size:13.5px; padding:8px 4px;}
+
+  .game-head{width:100%; display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; font-family:'IBM Plex Mono',monospace;}
+  .level-pill{background:rgba(55,231,224,.1); border:1px solid rgba(55,231,224,.4); color:var(--accent); padding:6px 12px; border-radius:999px; font-size:13px; font-weight:600;}
+  .stat{color:var(--ink-dim); font-size:13px;}
+  .stat b{color:var(--ink);}
+  .status-text{width:100%; text-align:center; color:var(--ink-dim); font-size:14.5px; margin-bottom:16px; min-height:20px; font-weight:600;}
+  .status-text.your-turn{color:var(--accent);}
+
+  .simon-wrap{width:100%; max-width:420px; aspect-ratio:1/1; position:relative; margin-bottom:18px;}
+  .simon-grid{
+    position:absolute; inset:0; display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; gap:10px;
+  }
+  .pad{
+    border:none; position:relative; filter:brightness(.62) saturate(.85);
+    transition:filter .12s ease, transform .1s ease;
+  }
+  .pad:active{transform:scale(.98);}
+  .pad.active{filter:brightness(1.15) saturate(1.2); box-shadow:0 0 40px currentColor;}
+  .pad-red{background:var(--red-dim); color:var(--red-lit); border-radius:100% 0 0 0;}
+  .pad-blue{background:var(--blue-dim); color:var(--blue-lit); border-radius:0 100% 0 0;}
+  .pad-green{background:var(--green-dim); color:var(--green-lit); border-radius:0 0 0 100%;}
+  .pad-yellow{background:var(--yellow-dim); color:var(--yellow-lit); border-radius:0 0 100% 0;}
+  .pad.active.pad-red{background:var(--red-lit);}
+  .pad.active.pad-blue{background:var(--blue-lit);}
+  .pad.active.pad-green{background:var(--green-lit);}
+  .pad.active.pad-yellow{background:var(--yellow-lit);}
+
+  .center-badge{
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    width:96px; height:96px; border-radius:50%; background:var(--bg2);
+    border:4px solid var(--chrome); display:flex; align-items:center; justify-content:center;
+    flex-direction:column; z-index:5; box-shadow:0 6px 20px rgba(0,0,0,.5);
+  }
+  .center-badge b{font-size:30px; font-family:'IBM Plex Mono',monospace; color:var(--ink);}
+  .center-badge span{font-size:9px; color:var(--ink-dim); text-transform:uppercase; letter-spacing:.08em;}
+
+  .controls{width:100%; display:flex; flex-direction:column; gap:10px;}
+
+  .overlay{
+    position:fixed; inset:0; background:rgba(4,4,6,.85); backdrop-filter:blur(3px);
+    display:none; align-items:center; justify-content:center; z-index:50; padding:20px;
+  }
+  .overlay.active{display:flex;}
+  .win-card{
+    width:100%; max-width:400px; background:linear-gradient(180deg, var(--panel), var(--bg2));
+    border:1px solid rgba(55,231,224,.4); border-radius:18px; padding:26px 22px; text-align:center;
+    box-shadow:0 20px 50px rgba(0,0,0,.55);
+  }
+  .win-title{font-size:22px; font-weight:700; color:var(--alert); margin-bottom:6px;}
+  .win-sub{color:var(--ink-dim); font-size:14px; margin-bottom:18px;}
+  .win-stats{display:flex; justify-content:center; gap:22px; margin-bottom:20px;}
+  .win-stat b{display:block; font-size:26px; color:var(--accent); font-family:'IBM Plex Mono',monospace;}
+  .win-stat span{font-size:11px; color:var(--ink-dim); text-transform:uppercase; letter-spacing:.08em;}
+
+  .footer-note{margin-top:22px; color:var(--ink-dim); font-size:11.5px; text-align:center; font-family:'IBM Plex Mono',monospace;}
+</style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="brand">TEC · Ing. en Computación</div>
+    <div class="brand" id="clockOut"></div>
+  </div>
+
+  <!-- ===================== START SCREEN ===================== -->
+  <div class="screen active" id="screenStart">
+    <div class="card">
+      <h1 class="title">Simón <span>Dice</span></h1>
+      <p class="lede">Observa la secuencia de colores y repítela tocando en el mismo orden. Cada ronda se agrega un color más. <b>¿Hasta dónde te alcanza la memoria?</b></p>
+      <div class="chip-row">
+        <div class="chip">🎨 4 colores</div>
+        <div class="chip">🧠 Secuencia infinita</div>
+        <div class="chip">🏆 Marcador en vivo</div>
+      </div>
+      <label class="field-label" for="nameInput">Tu nombre</label>
+      <input type="text" id="nameInput" placeholder="Ej. María, colegio..." maxlength="24" autocomplete="off">
+      <button class="btn btn-primary" id="startBtn" disabled>Comenzar reto →</button>
+    </div>
+
+    <div class="preview-title">Marcador de hoy</div>
+    <div class="card" style="padding:12px 16px;">
+      <div id="lbPreview"><div class="lb-empty">Cargando…</div></div>
+    </div>
+  </div>
+
+  <!-- ===================== GAME SCREEN ===================== -->
+  <div class="screen" id="screenGame">
+    <div class="game-head">
+      <div class="level-pill">Ronda <span id="roundNum">1</span></div>
+      <div class="stat">Mejor hoy: <b id="bestToday">—</b></div>
+    </div>
+    <p class="status-text" id="statusText">Prepárate…</p>
+
+    <div class="simon-wrap">
+      <div class="simon-grid">
+        <button class="pad pad-red" data-color="red"></button>
+        <button class="pad pad-blue" data-color="blue"></button>
+        <button class="pad pad-green" data-color="green"></button>
+        <button class="pad pad-yellow" data-color="yellow"></button>
+      </div>
+      <div class="center-badge"><b id="badgeNum">1</b><span>ronda</span></div>
+    </div>
+
+    <div class="controls">
+      <button class="btn btn-ghost" id="btnReplay" disabled>🔁 Repetir secuencia</button>
+    </div>
+  </div>
+
+  <!-- ===================== FINAL SCREEN ===================== -->
+  <div class="screen" id="screenFinal">
+    <div class="card" style="text-align:center;">
+      <h1 class="title" style="margin-bottom:4px;">¡Cadena rota! 🎉</h1>
+      <p class="lede" id="finalSummary" style="text-align:center;"></p>
+      <button class="btn btn-primary" id="playAgainBtn">Jugar de nuevo</button>
+    </div>
+    <div class="preview-title">Marcador de hoy — Top 10</div>
+    <div class="card" style="padding:12px 16px;">
+      <div id="lbFull"><div class="lb-empty">Cargando…</div></div>
+    </div>
+  </div>
+
+  <div class="footer-note">Feria Vocacional · Ingeniería en Computación · Campus Carlos</div>
+
+<script>
+(function(){
+  const COLORS = ['red','blue','green','yellow'];
+  const FREQS = {red:220.0, blue:392.0, green:329.63, yellow:261.63};
+
+  let playerName = "";
+  let sequence = [];
+  let completedRounds = 0;
+  let bestToday = 0;
+  let playerStep = 0;
+  let accepting = false;
+  let startTime = null;
+  let audioCtx = null;
+
+  const $ = id => document.getElementById(id);
+  const screens = {start:$('screenStart'), game:$('screenGame'), final:$('screenFinal')};
+  function showScreen(name){
+    Object.values(screens).forEach(s=>s.classList.remove('active'));
+    screens[name].classList.add('active');
+  }
+
+  function tickClock(){
+    const d = new Date();
+    $('clockOut').textContent = d.toLocaleTimeString('es-CR',{hour:'2-digit',minute:'2-digit'});
+  }
+  tickClock(); setInterval(tickClock, 30000);
+
+  $('nameInput').addEventListener('input', e=>{
+    $('startBtn').disabled = e.target.value.trim().length === 0;
+  });
+  $('nameInput').addEventListener('keydown', e=>{
+    if(e.key === 'Enter' && !$('startBtn').disabled) $('startBtn').click();
+  });
+
+  $('startBtn').addEventListener('click', ()=>{
+    playerName = $('nameInput').value.trim().slice(0,24) || 'Jugador';
+    showScreen('game');
+    startGame();
+  });
+
+  $('playAgainBtn').addEventListener('click', ()=>{
+    $('nameInput').value = '';
+    $('startBtn').disabled = true;
+    showScreen('start');
+    refreshLeaderboard('lbPreview', 5);
+  });
+
+  function sleep(ms){ return new Promise(res=>setTimeout(res, ms)); }
+
+  // ---------------- audio ----------------
+  function ensureAudio(){
+    if(!audioCtx){
+      try{ audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ audioCtx = null; }
+    }
+  }
+  function playTone(freq, durMs){
+    if(!audioCtx) return;
+    try{
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.type = 'sine';
+      o.frequency.value = freq;
+      g.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.28, audioCtx.currentTime+0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime+durMs/1000);
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start();
+      o.stop(audioCtx.currentTime + durMs/1000 + 0.03);
+    }catch(e){ /* ignore audio errors */ }
+  }
+
+  // ---------------- game state ----------------
+  function padEl(color){ return document.querySelector('.pad[data-color="'+color+'"]'); }
+
+  function flashPanel(color, durMs){
+    const el = padEl(color);
+    if(!el) return;
+    el.classList.add('active');
+    playTone(FREQS[color], durMs);
+    setTimeout(()=> el.classList.remove('active'), durMs);
+  }
+
+  function startGame(){
+    ensureAudio();
+    sequence = [];
+    completedRounds = 0;
+    bestToday = 0;
+    startTime = Date.now();
+    $('bestToday').textContent = '—';
+    fetchBest();
+    nextRound();
+  }
+
+  function nextRound(){
+    sequence.push(COLORS[Math.floor(Math.random()*COLORS.length)]);
+    playerStep = 0;
+    $('roundNum').textContent = sequence.length;
+    $('badgeNum').textContent = sequence.length;
+    $('btnReplay').disabled = true;
+    setStatus('Observa la secuencia…', false);
+    setTimeout(()=> playSequence(sequence), 550);
+  }
+
+  async function playSequence(seq){
+    accepting = false;
+    $('btnReplay').disabled = true;
+    for(const c of seq){
+      flashPanel(c, 420);
+      await sleep(420);
+      await sleep(180);
+    }
+    accepting = true;
+    $('btnReplay').disabled = false;
+    setStatus('¡Tu turno! Repite la secuencia', true);
+  }
+
+  function onPanelTap(color){
+    if(!accepting) return;
+    flashPanel(color, 220);
+    if(sequence[playerStep] !== color){
+      accepting = false;
+      gameOver();
+      return;
+    }
+    playerStep++;
+    if(playerStep === sequence.length){
+      completedRounds = sequence.length;
+      accepting = false;
+      $('btnReplay').disabled = true;
+      setStatus('¡Bien! Preparando siguiente ronda…', false);
+      setTimeout(nextRound, 700);
+    }
+  }
+
+  document.querySelectorAll('.pad').forEach(p=>{
+    p.addEventListener('click', ()=> onPanelTap(p.dataset.color));
+  });
+
+  $('btnReplay').addEventListener('click', ()=>{
+    if(!accepting) return;
+    playSequence(sequence);
+  });
+
+  function setStatus(text, yourTurn){
+    const el = $('statusText');
+    el.textContent = text;
+    el.classList.toggle('your-turn', !!yourTurn);
+  }
+
+  function gameOver(){
+    setStatus('¡Se rompió la cadena!', false);
+    playTone(110, 500);
+    document.querySelectorAll('.pad').forEach(p=> p.classList.add('active'));
+    setTimeout(()=>{
+      document.querySelectorAll('.pad').forEach(p=> p.classList.remove('active'));
+      finishRun();
+    }, 650);
+  }
+
+  function finishRun(){
+    const seconds = Math.round((Date.now()-startTime)/1000);
+    $('finalSummary').innerHTML = '<b style="color:var(--ink)">'+escapeHtml(playerName)+'</b>, llegaste a la ronda <b style="color:var(--accent)">'+completedRounds+'</b> en '+seconds+'s.';
+    showScreen('final');
+    saveScore(playerName, completedRounds, seconds);
+  }
+
+  function escapeHtml(s){
+    return s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  }
+
+  // ---------------- leaderboard (shared storage) ----------------
+  const LB_KEY = 'leaderboard_simon';
+
+  async function fetchBest(){
+    try{
+      const res = await window.storage.get(LB_KEY, true);
+      const list = (res && res.value) ? JSON.parse(res.value) : [];
+      if(list.length) $('bestToday').textContent = list[0].rounds;
+    }catch(e){ /* ignore */ }
+  }
+
+  async function saveScore(name, rounds, seconds){
+    try{
+      let list = [];
+      try{
+        const res = await window.storage.get(LB_KEY, true);
+        if(res && res.value) list = JSON.parse(res.value);
+      }catch(e){ list = []; }
+      list.push({name, rounds, seconds, ts:Date.now()});
+      list.sort((a,b)=> b.rounds - a.rounds || a.seconds - b.seconds);
+      list = list.slice(0,20);
+      await window.storage.set(LB_KEY, JSON.stringify(list), true);
+    }catch(e){ /* ignore storage errors, game still works */ }
+    refreshLeaderboard('lbFull', 10);
+  }
+
+  async function refreshLeaderboard(targetId, count){
+    const target = $(targetId);
+    try{
+      const res = await window.storage.get(LB_KEY, true);
+      const list = (res && res.value) ? JSON.parse(res.value) : [];
+      if(!list.length){ target.innerHTML = '<div class="lb-empty">Aún no hay puntajes hoy — ¡sé el primero!</div>'; return; }
+      target.innerHTML = list.slice(0,count).map((e,i)=>
+        '<div class="lb-row"><span class="lb-rank">'+(i+1)+'</span><span class="lb-name">'+escapeHtml(e.name)+'</span><span class="lb-score">ronda '+e.rounds+' · '+e.seconds+'s</span></div>'
+      ).join('');
+    }catch(e){
+      target.innerHTML = '<div class="lb-empty">Aún no hay puntajes hoy — ¡sé el primero!</div>';
+    }
+  }
+
+  refreshLeaderboard('lbPreview', 5);
+})();
+</script>
+</body>
+</html>

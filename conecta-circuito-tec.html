@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>Conecta el Circuito — Feria Vocacional TEC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#101B1A;
+    --bg2:#0A1413;
+    --panel:#12241F;
+    --teal:#00D9C0;
+    --teal-light:#6BFCEA;
+    --amber:#F2A93B;
+    --alert:#FF6B5B;
+    --ink:#EAF7F4;
+    --ink-dim:#8FB0A9;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{
+    margin:0; min-height:100vh;
+    background:
+      radial-gradient(ellipse at 15% -10%, #143530 0%, transparent 55%),
+      radial-gradient(ellipse at 100% 110%, #0E2622 0%, transparent 55%),
+      var(--bg);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    display:flex; flex-direction:column; align-items:center;
+    padding:18px 14px 28px; overflow-x:hidden;
+  }
+  h1,h2,h3{font-family:'Space Grotesk', sans-serif; margin:0;}
+  .mono{font-family:'IBM Plex Mono', monospace;}
+  button{font-family:inherit; cursor:pointer;}
+  ::selection{background:var(--teal); color:#04211f;}
+
+  .topbar{width:100%; max-width:560px; display:flex; align-items:baseline; justify-content:space-between; margin-bottom:10px;}
+  .brand{font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--teal-light); font-family:'IBM Plex Mono',monospace;}
+  .title{font-size:22px; font-weight:700; color:var(--ink);}
+  .title span{color:var(--amber);}
+
+  .screen{width:100%; max-width:560px; display:none; flex-direction:column; align-items:center;}
+  .screen.active{display:flex;}
+
+  .card{
+    width:100%; background:linear-gradient(180deg, var(--panel), var(--bg2));
+    border:1px solid rgba(0,217,192,.3); border-radius:18px; padding:22px 20px;
+    box-shadow:0 10px 30px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.03);
+  }
+  .lede{color:var(--ink-dim); font-size:15px; line-height:1.5; margin:6px 0 18px;}
+  .lede b{color:var(--ink);}
+  .chip-row{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px;}
+  .chip{
+    display:flex; align-items:center; gap:6px;
+    background:rgba(0,217,192,.08); border:1px solid rgba(0,217,192,.35);
+    color:var(--teal-light); font-size:12.5px; padding:6px 10px; border-radius:999px;
+    font-family:'IBM Plex Mono',monospace;
+  }
+  label.field-label{display:block; font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-dim); margin-bottom:6px; font-family:'IBM Plex Mono',monospace;}
+  input[type=text]{
+    width:100%; padding:14px 14px; font-size:17px; border-radius:12px;
+    border:1.5px solid rgba(0,217,192,.4); background:var(--bg2); color:var(--ink);
+    outline:none; margin-bottom:16px; font-family:'IBM Plex Sans',sans-serif;
+  }
+  input[type=text]:focus{border-color:var(--amber); box-shadow:0 0 0 3px rgba(242,169,59,.18);}
+  .btn{border:none; border-radius:14px; padding:16px 20px; font-weight:600; font-size:16px; width:100%; transition:transform .12s ease, filter .12s ease;}
+  .btn:active{transform:scale(.97);}
+  .btn-primary{background:linear-gradient(180deg, var(--teal-light), var(--teal)); color:#04211f; box-shadow:0 6px 18px rgba(0,217,192,.3);}
+  .btn-primary:disabled{filter:grayscale(.6) opacity(.5); box-shadow:none;}
+  .btn-ghost{background:transparent; color:var(--ink-dim); border:1.5px solid rgba(234,247,244,.22);}
+
+  .preview-title{font-size:12px; text-transform:uppercase; letter-spacing:.1em; color:var(--ink-dim); margin:20px 0 8px; font-family:'IBM Plex Mono',monospace;}
+  .lb-row{display:flex; justify-content:space-between; align-items:center; padding:9px 4px; border-bottom:1px dashed rgba(0,217,192,.22); font-size:14.5px;}
+  .lb-row:last-child{border-bottom:none;}
+  .lb-rank{color:var(--amber); width:22px; font-family:'IBM Plex Mono',monospace; font-weight:700;}
+  .lb-name{flex:1; padding:0 8px; color:var(--ink);}
+  .lb-score{color:var(--teal-light); font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:13.5px;}
+  .lb-empty{color:var(--ink-dim); font-size:13.5px; padding:8px 4px;}
+
+  .game-head{width:100%; display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; font-family:'IBM Plex Mono',monospace;}
+  .level-pill{background:rgba(242,169,59,.12); border:1px solid rgba(242,169,59,.4); color:var(--amber); padding:6px 12px; border-radius:999px; font-size:13px; font-weight:600;}
+  .stat{color:var(--ink-dim); font-size:13px;}
+  .stat b{color:var(--ink);}
+  .instr-text{width:100%; color:var(--ink-dim); font-size:13.5px; margin-bottom:10px; line-height:1.4;}
+
+  .board-wrap{
+    width:100%; aspect-ratio:1/1; max-width:480px; position:relative;
+    background:var(--bg2); border-radius:16px; border:2px solid rgba(0,217,192,.35);
+    box-shadow:inset 0 0 40px rgba(0,0,0,.55), 0 10px 26px rgba(0,0,0,.4);
+    overflow:hidden; margin-bottom:14px;
+  }
+  .grid{position:absolute; inset:0; display:grid;}
+  .cell{position:relative; border:1px solid rgba(255,255,255,.02);}
+  .cell.blank{background:repeating-linear-gradient(135deg, #0A1615, #0A1615 6px, #0D1B19 6px, #0D1B19 12px);}
+  .cell.pipe{background:#0D1F1C;}
+
+  .pipe-inner{position:absolute; inset:0; transition:transform .22s cubic-bezier(.4,0,.2,1);}
+  .pipe-hub{position:absolute; top:32%; left:32%; width:36%; height:36%; border-radius:50%; background:var(--teal); box-shadow:0 0 10px rgba(0,217,192,.7); z-index:2;}
+  .pipe-arm{position:absolute; background:var(--teal); z-index:1;}
+  .arm-N{top:0; left:41%; width:18%; height:52%;}
+  .arm-S{bottom:0; left:41%; width:18%; height:52%;}
+  .arm-E{right:0; top:41%; height:18%; width:52%;}
+  .arm-W{left:0; top:41%; height:18%; width:52%;}
+
+  .cell.solved .pipe-hub, .cell.solved .pipe-arm{background:var(--amber); box-shadow:0 0 12px rgba(242,169,59,.8);}
+
+  .endpoint-icon{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    font-size:20px; z-index:3; pointer-events:none;
+  }
+
+  .toast{
+    position:absolute; left:50%; top:10px; transform:translateX(-50%);
+    background:rgba(10,20,19,.92); border:1px solid var(--teal); color:var(--ink);
+    padding:8px 14px; border-radius:10px; font-size:13px; font-family:'IBM Plex Mono',monospace;
+    opacity:0; pointer-events:none; transition:opacity .25s ease; z-index:9;
+  }
+  .toast.show{opacity:1;}
+
+  .controls{width:100%; display:flex; flex-direction:column; gap:10px;}
+
+  .overlay{
+    position:fixed; inset:0; background:rgba(4,10,9,.82); backdrop-filter:blur(3px);
+    display:none; align-items:center; justify-content:center; z-index:50; padding:20px;
+  }
+  .overlay.active{display:flex;}
+  .win-card{
+    width:100%; max-width:400px; background:linear-gradient(180deg, var(--panel), var(--bg2));
+    border:1px solid rgba(242,169,59,.5); border-radius:18px; padding:26px 22px; text-align:center;
+    box-shadow:0 20px 50px rgba(0,0,0,.5);
+  }
+  .win-title{font-size:22px; font-weight:700; color:var(--amber); margin-bottom:6px;}
+  .win-sub{color:var(--ink-dim); font-size:14px; margin-bottom:18px;}
+  .win-stats{display:flex; justify-content:center; gap:22px; margin-bottom:20px;}
+  .win-stat b{display:block; font-size:24px; color:var(--teal-light); font-family:'IBM Plex Mono',monospace;}
+  .win-stat span{font-size:11px; color:var(--ink-dim); text-transform:uppercase; letter-spacing:.08em;}
+
+  .footer-note{margin-top:22px; color:var(--ink-dim); font-size:11.5px; text-align:center; font-family:'IBM Plex Mono',monospace;}
+</style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="brand">TEC · Ing. en Computación</div>
+    <div class="brand" id="clockOut"></div>
+  </div>
+
+  <!-- ===================== START SCREEN ===================== -->
+  <div class="screen active" id="screenStart">
+    <div class="card">
+      <h1 class="title">Conecta el <span>Circuito</span></h1>
+      <p class="lede">Toca una tubería para girarla 90°. Conecta la fuente ⚡ con el destino 🎯 formando un camino continuo. <b>Una sola regla, tablero completo por resolver.</b></p>
+      <div class="chip-row">
+        <div class="chip">⚡ 3 niveles</div>
+        <div class="chip">🔄 Menos giros = mejor</div>
+        <div class="chip">🏆 Marcador en vivo</div>
+      </div>
+      <label class="field-label" for="nameInput">Tu nombre</label>
+      <input type="text" id="nameInput" placeholder="Ej. María, colegio..." maxlength="24" autocomplete="off">
+      <button class="btn btn-primary" id="startBtn" disabled>Comenzar reto →</button>
+    </div>
+
+    <div class="preview-title">Marcador de hoy</div>
+    <div class="card" style="padding:12px 16px;">
+      <div id="lbPreview"><div class="lb-empty">Cargando…</div></div>
+    </div>
+  </div>
+
+  <!-- ===================== GAME SCREEN ===================== -->
+  <div class="screen" id="screenGame">
+    <div class="game-head">
+      <div class="level-pill">Nivel <span id="lvlNum">1</span>/3</div>
+      <div class="stat">Giros: <b id="turnCount">0</b></div>
+    </div>
+    <p class="instr-text">Toca cualquier tubería para girarla. Conecta ⚡ con 🎯.</p>
+
+    <div class="board-wrap">
+      <div class="grid" id="grid"></div>
+      <div class="toast" id="toast">✅ ¡Circuito conectado!</div>
+    </div>
+
+    <div class="controls">
+      <button class="btn btn-ghost" id="btnShuffle">🔀 Revolver de nuevo</button>
+    </div>
+  </div>
+
+  <!-- ===================== FINAL SCREEN ===================== -->
+  <div class="screen" id="screenFinal">
+    <div class="card" style="text-align:center;">
+      <h1 class="title" style="margin-bottom:4px;">¡Red completa! 🎉</h1>
+      <p class="lede" id="finalSummary" style="text-align:center;"></p>
+      <button class="btn btn-primary" id="playAgainBtn">Jugar de nuevo</button>
+    </div>
+    <div class="preview-title">Marcador de hoy — Top 10</div>
+    <div class="card" style="padding:12px 16px;">
+      <div id="lbFull"><div class="lb-empty">Cargando…</div></div>
+    </div>
+  </div>
+
+  <div class="footer-note">Feria Vocacional · Ingeniería en Computación · Campus Carlos</div>
+
+  <!-- ===================== WIN (level) OVERLAY ===================== -->
+  <div class="overlay" id="overlay">
+    <div class="win-card">
+      <div class="win-title" id="overlayTitle">¡Circuito conectado!</div>
+      <div class="win-sub" id="overlaySub">La señal llegó a la meta.</div>
+      <div class="win-stats">
+        <div class="win-stat"><b id="overlayTurns">0</b><span>Giros</span></div>
+        <div class="win-stat"><b id="overlayLevel">1/3</b><span>Nivel</span></div>
+      </div>
+      <button class="btn btn-primary" id="overlayNextBtn">Siguiente nivel →</button>
+    </div>
+  </div>
+
+<script>
+(function(){
+  // ---------------- direction helpers ----------------
+  const DIR_ORDER = ['N','E','S','W'];
+  const DIR_VEC = { N:{dr:-1,dc:0}, E:{dr:0,dc:1}, S:{dr:1,dc:0}, W:{dr:0,dc:-1} };
+  const OPPOSITE = { N:'S', S:'N', E:'W', W:'E' };
+  function rotateDir(dir, steps){
+    const i = DIR_ORDER.indexOf(dir);
+    return DIR_ORDER[(i + steps + 400) % 4];
+  }
+  function dirBetween(a, b){
+    const dr = b[0]-a[0], dc = b[1]-a[1];
+    for(const d of DIR_ORDER){ if(DIR_VEC[d].dr===dr && DIR_VEC[d].dc===dc) return d; }
+    return null;
+  }
+
+  const LEVELS = [
+    { n:5, minLen:6,  maxLen:9  },
+    { n:6, minLen:9,  maxLen:13 },
+    { n:7, minLen:13, maxLen:18 },
+  ];
+
+  let playerName = "";
+  let curLevel = 0;
+  let gridSize = 5;
+  let path = [];          // array of [r,c]
+  let cellBase = {};      // key "r,c" -> array of base open dirs (1 or 2)
+  let cellRot = {};       // key "r,c" -> rotation 0..3
+  let totalTurns = 0;
+  let running = false;
+  let startTime = null;
+
+  const $ = id => document.getElementById(id);
+  const screens = {start:$('screenStart'), game:$('screenGame'), final:$('screenFinal')};
+  function showScreen(name){
+    Object.values(screens).forEach(s=>s.classList.remove('active'));
+    screens[name].classList.add('active');
+  }
+
+  function tickClock(){
+    const d = new Date();
+    $('clockOut').textContent = d.toLocaleTimeString('es-CR',{hour:'2-digit',minute:'2-digit'});
+  }
+  tickClock(); setInterval(tickClock, 30000);
+
+  $('nameInput').addEventListener('input', e=>{
+    $('startBtn').disabled = e.target.value.trim().length === 0;
+  });
+  $('nameInput').addEventListener('keydown', e=>{
+    if(e.key === 'Enter' && !$('startBtn').disabled) $('startBtn').click();
+  });
+
+  $('startBtn').addEventListener('click', ()=>{
+    playerName = $('nameInput').value.trim().slice(0,24) || 'Jugador';
+    curLevel = 0; totalTurns = 0; startTime = Date.now();
+    showScreen('game');
+    loadLevel(0);
+  });
+
+  $('playAgainBtn').addEventListener('click', ()=>{
+    $('nameInput').value = '';
+    $('startBtn').disabled = true;
+    showScreen('start');
+    refreshLeaderboard('lbPreview', 5);
+  });
+
+  // ---------------- path generation ----------------
+  function buildPath(n, minLen, maxLen){
+    const targetLen = minLen + Math.floor(Math.random()*(maxLen-minLen+1));
+    for(let attempt=0; attempt<300; attempt++){
+      const visited = new Set();
+      const p = [];
+      let r = Math.floor(Math.random()*n), c = Math.floor(Math.random()*n);
+      p.push([r,c]); visited.add(r+','+c);
+      let stuck = false;
+      while(p.length < targetLen && !stuck){
+        const [cr,cc] = p[p.length-1];
+        const options = DIR_ORDER
+          .map(d=>({r:cr+DIR_VEC[d].dr, c:cc+DIR_VEC[d].dc}))
+          .filter(pt=> pt.r>=0 && pt.r<n && pt.c>=0 && pt.c<n && !visited.has(pt.r+','+pt.c));
+        if(options.length===0){ stuck = true; break; }
+        const pick = options[Math.floor(Math.random()*options.length)];
+        p.push([pick.r,pick.c]);
+        visited.add(pick.r+','+pick.c);
+      }
+      if(p.length >= minLen) return p;
+    }
+    // fallback: guaranteed straight line
+    const len = Math.min(minLen, n);
+    const p = [];
+    for(let i=0;i<len;i++) p.push([0,i]);
+    return p;
+  }
+
+  function loadLevel(idx){
+    const cfg = LEVELS[idx];
+    gridSize = cfg.n;
+    path = buildPath(cfg.n, cfg.minLen, cfg.maxLen);
+    cellBase = {};
+    cellRot = {};
+    path.forEach((cell, i)=>{
+      const dirs = [];
+      if(i>0) dirs.push(dirBetween(cell, path[i-1]));
+      if(i<path.length-1) dirs.push(dirBetween(cell, path[i+1]));
+      cellBase[cell[0]+','+cell[1]] = dirs;
+      cellRot[cell[0]+','+cell[1]] = Math.floor(Math.random()*4);
+    });
+    running = false;
+    $('lvlNum').textContent = (idx+1);
+    $('turnCount').textContent = totalTurns;
+    buildGrid();
+  }
+
+  function openDirsFor(key){
+    return cellBase[key].map(d=> rotateDir(d, cellRot[key]));
+  }
+
+  function isSolved(){
+    for(let i=0;i<path.length-1;i++){
+      const a = path[i], b = path[i+1];
+      const keyA = a[0]+','+a[1], keyB = b[0]+','+b[1];
+      const dirAB = dirBetween(a,b);
+      const openA = openDirsFor(keyA);
+      const openB = openDirsFor(keyB);
+      if(openA.indexOf(dirAB) === -1) return false;
+      if(openB.indexOf(OPPOSITE[dirAB]) === -1) return false;
+    }
+    return true;
+  }
+
+  function buildGrid(){
+    const grid = $('grid');
+    grid.innerHTML = '';
+    grid.style.gridTemplateColumns = 'repeat('+gridSize+', 1fr)';
+    grid.style.gridTemplateRows = 'repeat('+gridSize+', 1fr)';
+    const pathSet = {};
+    path.forEach(c=> pathSet[c[0]+','+c[1]] = true);
+
+    for(let r=0;r<gridSize;r++){
+      for(let c=0;c<gridSize;c++){
+        const key = r+','+c;
+        const cell = document.createElement('div');
+        cell.dataset.key = key;
+        if(pathSet[key]){
+          cell.className = 'cell pipe';
+          const inner = document.createElement('div');
+          inner.className = 'pipe-inner';
+          inner.style.transform = 'rotate('+(cellRot[key]*90)+'deg)';
+          const hub = document.createElement('div');
+          hub.className = 'pipe-hub';
+          inner.appendChild(hub);
+          cellBase[key].forEach(d=>{
+            const arm = document.createElement('div');
+            arm.className = 'pipe-arm arm-'+d;
+            inner.appendChild(arm);
+          });
+          cell.appendChild(inner);
+          if(r===path[0][0] && c===path[0][1]){
+            const icon = document.createElement('div');
+            icon.className = 'endpoint-icon'; icon.textContent = '⚡';
+            cell.appendChild(icon);
+          } else if(r===path[path.length-1][0] && c===path[path.length-1][1]){
+            const icon = document.createElement('div');
+            icon.className = 'endpoint-icon'; icon.textContent = '🎯';
+            cell.appendChild(icon);
+          }
+          cell.addEventListener('click', ()=> onCellTap(key));
+        } else {
+          cell.className = 'cell blank';
+        }
+        grid.appendChild(cell);
+      }
+    }
+    updateSolvedStyle();
+  }
+
+  function onCellTap(key){
+    if(running) return;
+    cellRot[key] = (cellRot[key] + 1) % 4;
+    totalTurns++;
+    $('turnCount').textContent = totalTurns;
+    const cellEl = document.querySelector('.cell[data-key="'+key+'"] .pipe-inner');
+    if(cellEl) cellEl.style.transform = 'rotate('+(cellRot[key]*90)+'deg)';
+    if(isSolved()){
+      running = true;
+      updateSolvedStyle();
+      showToast('✅ ¡Circuito conectado!');
+      setTimeout(levelComplete, 500);
+    }
+  }
+
+  function updateSolvedStyle(){
+    const solved = isSolved();
+    path.forEach(c=>{
+      const el = document.querySelector('.cell[data-key="'+c[0]+','+c[1]+'"]');
+      if(el) el.classList.toggle('solved', solved);
+    });
+  }
+
+  function showToast(msg){
+    const t = $('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'), 1400);
+  }
+
+  $('btnShuffle').addEventListener('click', ()=>{
+    if(running) return;
+    path.forEach(c=>{ cellRot[c[0]+','+c[1]] = Math.floor(Math.random()*4); });
+    buildGrid();
+  });
+
+  // ---------------- level complete ----------------
+  function levelComplete(){
+    const isLast = curLevel === LEVELS.length-1;
+    $('overlayTitle').textContent = isLast ? '¡Reto completado! 🏁' : '¡Circuito conectado!';
+    $('overlaySub').textContent = isLast ? 'Conectaste los tres circuitos.' : 'La señal llegó a la meta.';
+    $('overlayTurns').textContent = totalTurns;
+    $('overlayLevel').textContent = (curLevel+1)+'/'+LEVELS.length;
+    $('overlayNextBtn').textContent = isLast ? 'Ver resultados →' : 'Siguiente nivel →';
+    $('overlay').classList.add('active');
+
+    $('overlayNextBtn').onclick = ()=>{
+      $('overlay').classList.remove('active');
+      if(isLast){ finishRun(); }
+      else { curLevel++; loadLevel(curLevel); }
+    };
+  }
+
+  function finishRun(){
+    const seconds = Math.round((Date.now()-startTime)/1000);
+    $('finalSummary').innerHTML = '<b style="color:var(--ink)">'+escapeHtml(playerName)+'</b>, conectaste los 3 circuitos en <b style="color:var(--teal-light)">'+totalTurns+'</b> giros y <b style="color:var(--teal-light)">'+seconds+'s</b>.';
+    showScreen('final');
+    saveScore(playerName, totalTurns, seconds);
+  }
+
+  function escapeHtml(s){
+    return s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  }
+
+  // ---------------- leaderboard (shared storage) ----------------
+  const LB_KEY = 'leaderboard_tuberias';
+
+  async function saveScore(name, turns, seconds){
+    try{
+      let list = [];
+      try{
+        const res = await window.storage.get(LB_KEY, true);
+        if(res && res.value) list = JSON.parse(res.value);
+      }catch(e){ list = []; }
+      list.push({name, turns, seconds, ts:Date.now()});
+      list.sort((a,b)=> a.turns - b.turns || a.seconds - b.seconds);
+      list = list.slice(0,20);
+      await window.storage.set(LB_KEY, JSON.stringify(list), true);
+    }catch(e){ /* ignore storage errors, game still works */ }
+    refreshLeaderboard('lbFull', 10);
+  }
+
+  async function refreshLeaderboard(targetId, count){
+    const target = $(targetId);
+    try{
+      const res = await window.storage.get(LB_KEY, true);
+      const list = (res && res.value) ? JSON.parse(res.value) : [];
+      if(!list.length){ target.innerHTML = '<div class="lb-empty">Aún no hay puntajes hoy — ¡sé el primero!</div>'; return; }
+      target.innerHTML = list.slice(0,count).map((e,i)=>
+        '<div class="lb-row"><span class="lb-rank">'+(i+1)+'</span><span class="lb-name">'+escapeHtml(e.name)+'</span><span class="lb-score">'+e.turns+' giros · '+e.seconds+'s</span></div>'
+      ).join('');
+    }catch(e){
+      target.innerHTML = '<div class="lb-empty">Aún no hay puntajes hoy — ¡sé el primero!</div>';
+    }
+  }
+
+  refreshLeaderboard('lbPreview', 5);
+})();
+</script>
+</body>
+</html>
