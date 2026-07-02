@@ -36,7 +36,7 @@
 
   .view{width:100%; display:none; flex-direction:column; align-items:center; flex:1; padding-bottom:24px;}
   .view.active{display:flex;}
-  .view-body{width:100%; max-width:560px; display:flex; flex-direction:column; align-items:center; padding:0 16px;}
+  .view-body{width:100%; flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;}
 
   .hidden{display:none !important;}
 
@@ -264,6 +264,7 @@
     <div class="appbar-spacer"></div>
     <button class="btn-nav" id="fsBtnHub" style="background:transparent;border:1.5px solid #2A2A35;color:#CFCFDA;">⛶ Pantalla completa</button>
   </div>
+  <div class="view-body">
   <div class="marquee">
     <div class="marquee-inner">
       <div class="marquee-eyebrow">Feria Vocacional</div>
@@ -293,6 +294,7 @@
     <button class="btn-outline-hub" id="goLeaderboard">🏆 Ver marcadores</button>
   </div>
   <a href="#admin" class="admin-link">admin</a>
+  </div>
 </div>
 
 <!-- ===================== SIMON ===================== -->
@@ -302,6 +304,7 @@
     <div class="appbar-spacer"></div>
     <button class="btn-nav" id="fsBtnSimon" style="background:transparent;border:1.5px solid #2A2620;color:#2A2620;">⛶</button>
   </div>
+  <div class="view-body">
 
   <!-- name entry -->
   <div class="simon-card" id="simonNameScreen">
@@ -357,6 +360,7 @@
       <button class="btn-simon-ghost" id="simonToLeaderboardBtn">VER MARCADORES</button>
     </div>
   </div>
+  </div>
 </div>
 
 <!-- ===================== PIPES ===================== -->
@@ -366,6 +370,7 @@
     <div class="appbar-spacer"></div>
     <button class="btn-nav" id="fsBtnPipes" style="background:transparent;border:1.5px solid #EFE6D6;color:#EFE6D6;">⛶</button>
   </div>
+  <div class="view-body">
 
   <!-- name entry -->
   <div class="pipes-panel" id="pipesNameScreen">
@@ -409,6 +414,7 @@
       <button class="btn-pipes-ghost" id="pipesToLeaderboardBtn">VER MARCADORES</button>
     </div>
   </div>
+  </div>
 </div>
 
 <!-- ===================== LEADERBOARD ===================== -->
@@ -418,6 +424,7 @@
     <div class="appbar-spacer"></div>
     <button class="btn-nav" id="fsBtnLb" style="background:transparent;border:1.5px solid #2A2A35;color:#CFCFDA;">⛶</button>
   </div>
+  <div class="view-body">
   <div class="lb-section">
     <div class="lb-column">
       <div class="lb-title">SIMÓN DICE — mejores rachas</div>
@@ -428,6 +435,7 @@
       <div class="lb-panel"><div id="lbPipes"><div class="lb-empty">Aún no hay puntajes en esta iPad.</div></div></div>
     </div>
   </div>
+  </div>
 </div>
 
 <!-- ===================== ADMIN ===================== -->
@@ -436,6 +444,7 @@
     <button class="btn-nav" data-back style="background:transparent;border:1.5px solid #2E8B3A;color:#8DFFA0;">← Inicio</button>
     <div class="appbar-spacer"></div>
   </div>
+  <div class="view-body">
   <div class="admin-term">
     <div class="admin-title">panel de administracion</div>
     <div class="admin-row"><span>Simón Dice — puntajes guardados</span><b id="adminSimonCount">0</b></div>
@@ -446,6 +455,7 @@
       <button class="btn-admin danger" id="btnClearAll">limpiar todos los datos</button>
     </div>
     <div class="admin-msg" id="adminMsg"></div>
+  </div>
   </div>
 </div>
 

@@ -41,3 +41,10 @@ Panel de administración en `feria-tec.html#admin` (o el enlace discreto
 
 - `simon-tec.html`, `conecta-circuito-tec.html` — versiones independientes de
   cada juego (anteriores a la unificación en `feria-tec.html`).
+
+## Deploy en Netlify
+
+`netlify.toml` ya deja el sitio listo: conecta este repo en Netlify (Add
+new site → Import an existing project) y cada `git push` se publica solo,
+sirviendo `feria-tec.html` en la raíz. No hace falta mantener copias
+manuales (la carpeta `deploy/` ya no es necesaria y se puede borrar).
