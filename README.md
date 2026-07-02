@@ -16,8 +16,9 @@ está disponible como respaldo).
 
 - **Simón Dice** — memoriza y repite la secuencia de colores; cada ronda suma
   un paso más. Basado en el diseño original de Milton Bradley (1978).
-- **Conecta el Circuito** — gira tuberías 90° para conectar el inicio con la
-  meta. Estética inspirada en Pipe Dream / Pipe Mania (1989).
+- **Overclock** — estabiliza la aguja del medidor tocando en el instante justo
+  mientras está dentro de la zona segura. Cada ronda la zona se encoge y la
+  aguja acelera, así que solo unos pocos llegan lejos.
 
 ## Marcadores y datos
 
