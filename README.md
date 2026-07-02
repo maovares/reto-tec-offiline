@@ -30,9 +30,9 @@ Panel de administración en `feria-tec.html#admin` (o el enlace discreto
 
 ## Capturas
 
-| Menú principal | Simón Dice | Conecta el Circuito |
+| Menú principal | Simón Dice | Overclock |
 |---|---|---|
-| ![Hub](screenshots/hub.png) | ![Simón Dice](screenshots/simon-dice.png) | ![Conecta el Circuito](screenshots/conecta-circuito.png) |
+| ![Hub](screenshots/hub.png) | ![Simón Dice](screenshots/simon-dice.png) | ![Overclock](screenshots/overclock.png) |
 
 | Marcadores | Admin |
 |---|---|
