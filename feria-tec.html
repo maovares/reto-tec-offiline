@@ -588,9 +588,8 @@
     if(btn) btn.addEventListener('click', toggleFullscreen);
   });
 
-  // ---- inactividad: abandona partidas/paneles solos y "atrapa miradas" desde el hub ----
+  // ---- inactividad: abandona partidas/paneles solos y vuelve al inicio ----
   const GAME_IDLE_MS = 45000;   // fuera del hub, sin toques -> vuelve al hub
-  const HUB_ATTRACT_MS = 20000; // en el hub, sin toques -> muestra marcadores para llamar la atención
   let lastActivityTs = Date.now();
   function touchActivity(){ lastActivityTs = Date.now(); }
   ['click','touchstart','keydown','input'].forEach(evt=>
@@ -599,9 +598,7 @@
   setInterval(()=>{
     const idleFor = Date.now() - lastActivityTs;
     const current = views.find(v=> $('view'+v).classList.contains('active'));
-    if(current === 'Hub'){
-      if(idleFor > HUB_ATTRACT_MS){ touchActivity(); showView('Leaderboard'); renderLeaderboards(); }
-    } else if(idleFor > GAME_IDLE_MS){
+    if(current !== 'Hub' && idleFor > GAME_IDLE_MS){
       touchActivity(); goHub();
     }
   }, 2000);
