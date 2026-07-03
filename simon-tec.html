@@ -241,10 +241,15 @@
     if(e.key === 'Enter' && !$('startBtn').disabled) $('startBtn').click();
   });
 
+  function resetScroll(){ window.scrollTo(0,0); document.body.scrollTop = 0; document.documentElement.scrollTop = 0; }
+  $('nameInput').addEventListener('blur', ()=> setTimeout(resetScroll, 100));
+
   $('startBtn').addEventListener('click', ()=>{
     playerName = $('nameInput').value.trim().slice(0,24) || 'Jugador';
+    $('nameInput').blur();
     showScreen('game');
     startGame();
+    setTimeout(resetScroll, 100);
   });
 
   $('playAgainBtn').addEventListener('click', ()=>{

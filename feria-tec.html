@@ -690,17 +690,22 @@
     $('simonStartBtn').disabled = true;
   }
 
+  function resetScroll(){ window.scrollTo(0,0); document.body.scrollTop = 0; document.documentElement.scrollTop = 0; }
+
   $('simonNameInput').addEventListener('input', e=>{
     $('simonStartBtn').disabled = e.target.value.trim().length === 0;
   });
   $('simonNameInput').addEventListener('keydown', e=>{
     if(e.key === 'Enter' && !$('simonStartBtn').disabled) $('simonStartBtn').click();
   });
+  $('simonNameInput').addEventListener('blur', ()=> setTimeout(resetScroll, 100));
   $('simonStartBtn').addEventListener('click', ()=>{
     simonPlayerName = $('simonNameInput').value.trim().slice(0,24) || 'Jugador';
+    $('simonNameInput').blur();
     $('simonNameScreen').classList.add('hidden');
     $('simonPlayScreen').classList.remove('hidden');
     startSimonGame();
+    setTimeout(resetScroll, 100);
   });
   $('simonPlayAgainBtn').addEventListener('click', resetSimonToName);
 
@@ -859,11 +864,14 @@
   $('overclockNameInput').addEventListener('keydown', e=>{
     if(e.key === 'Enter' && !$('overclockStartBtn').disabled) $('overclockStartBtn').click();
   });
+  $('overclockNameInput').addEventListener('blur', ()=> setTimeout(resetScroll, 100));
   $('overclockStartBtn').addEventListener('click', ()=>{
     ocPlayerName = $('overclockNameInput').value.trim().slice(0,24) || 'Jugador';
+    $('overclockNameInput').blur();
     $('overclockNameScreen').classList.add('hidden');
     $('overclockPlayScreen').classList.remove('hidden');
     startOverclockGame();
+    setTimeout(resetScroll, 100);
   });
   $('overclockPlayAgainBtn').addEventListener('click', resetOverclockToName);
 
